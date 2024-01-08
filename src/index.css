@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+body {
+  background-color: rgb(11, 21, 38);
+  font-family: 'Sora';
+  scroll-behavior: smooth;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.sora {
+  font-family: 'Sora';
+}
+
+.fira-code {
+  font-family: 'Fira Code';
+}
+
+.tip-trigger:hover + .tip-overlay {
+  position: fixed;
+  top: -150vh;
+  left: -150vw;
+  width: 300vw;
+  height: 300vh;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 0;
+}
