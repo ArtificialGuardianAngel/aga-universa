@@ -1,0 +1,53 @@
+variables:
+  PROJECT_PATH: '/home/gitlab-runner/universa.aga'
+  BACKUP_PATH: '/var/backups/universa.aga'
+  NGINX_CONF: './nginx/production.conf'
+  HTML_PATH: '/var/www/universa.aga.vision/'
+
+stages:
+  - build
+  - deploy
+  - rollback
+
+build:
+  stage: build
+  script:
+    # - echo $VITE_API_URL
+    - sudo rm -rf $PROJECT_PATH/*
+    - rsync -av --progress . $PROJECT_PATH
+    - cd $PROJECT_PATH
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  script:
+    - sudo cp $NGINX_CONF /etc/nginx/sites-available/universa.aga.vision
+    - cd $PROJECT_PATH
+    - ls -la
+    - if [ -d $HTML_PATH ]; then sudo mkdir $BACKUP_PATH/$CI_COMMIT_SHORT_SHA && sudo cp -r $HTML_PATH $BACKUP_PATH/$CI_COMMIT_SHORT_SHA; fi
+    - sudo rm -rf $HTML_PATH/*
+    - sudo cp -r ./dist/* $HTML_PATH
+    - sudo nginx -t
+    - sudo nginx -s reload
+  environment:
+    name: production
+  only:
+    - main
+
+rollback:
+  stage: rollback
+  script:
+    - cd $PROJECT_PATH
+    - LAST_DEPLOY=$(ls -td -- $BACKUP_PATH/* | head -n 1)
+    - sudo rm -rf $HTML_PATH
+    - sudo mv $LAST_DEPLOY $HTML_PATH
+  when: manual
+  environment:
+    name: production
